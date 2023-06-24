@@ -1,0 +1,37 @@
+{
+	"schemaVersion": 1,
+	"id": "harmonylink",
+	"version": "${version}",
+	"name": "HarmonyLink Mod",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Jordon Brooks"
+	],
+	"contact": {
+		"homepage": "https://jordongamedev.co.uk/",
+		"sources": "https://github.com/Jordonbc/HarmonyLink-MC"
+	},
+	"license": "MIT License",
+	"icon": "assets/harmonylink/Icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.harmonylink.HarmonyLinkMain"
+		],
+		"client": [
+			"com.harmonylink.HarmonyLinkClient"
+		]
+	},
+	"mixins": [
+		"harmonylink.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.14.21",
+		"minecraft": "~1.19.4",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
