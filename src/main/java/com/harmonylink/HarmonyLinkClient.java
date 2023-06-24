@@ -16,8 +16,10 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+import static net.fabricmc.loader.impl.FabricLoaderImpl.MOD_ID;
+
 public class HarmonyLinkClient implements ClientModInitializer {
-    public static final Logger LOGGER = LogManager.getLogger();
+    public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
     private BatteryInfo batteryInfo;
     private int tickCount = 0;
 
