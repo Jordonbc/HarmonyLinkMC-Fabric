@@ -65,8 +65,6 @@ public class OptionsMenu extends Screen {
                 case FAST -> settings.GraphicsMode.setValue(GraphicsMode.FANCY);
             }
 
-            GraphicsMode NewGraphicsMode = settings.GraphicsMode.getValue();
-
             String newMode = settings.GraphicsMode.getValue().toString();
             newMode = newMode.substring(0, 1).toUpperCase() + newMode.substring(1).toLowerCase();
 
@@ -159,9 +157,5 @@ public class OptionsMenu extends Screen {
         int titleY = 20;
 
         drawCenteredTextWithShadow(matrices, textRenderer, title, titleX, titleY, 0xFFFFFF);
-    }
-
-    public static double getRangedValue(double input, double minValue, double maxValue) {
-        return MathHelper.clamp((input - minValue) / (maxValue - minValue), 0.0, 1.0);
     }
 }
