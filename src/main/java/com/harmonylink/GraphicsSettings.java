@@ -72,16 +72,14 @@ public class GraphicsSettings {
 
 
 
-    public boolean saveSettingsToFile() {
+    public void saveSettingsToFile() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
         try (FileWriter writer = new FileWriter(file)) {
             gson.toJson(this, writer);
             LOGGER.info("Options saved successfully.");
-            return true;
         } catch (IOException e) {
             LOGGER.error("Error saving options: " + e.getMessage());
-            return false;
         }
     }
 

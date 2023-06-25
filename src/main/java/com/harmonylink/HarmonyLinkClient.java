@@ -18,6 +18,8 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
 
 import static net.fabricmc.loader.impl.FabricLoaderImpl.MOD_ID;
 
@@ -28,6 +30,8 @@ public class HarmonyLinkClient implements ClientModInitializer {
     public static GraphicsSettings batterySettings;
     public static GraphicsSettings chargingSettings;
     public static GraphicsSettings dockedSettings;
+
+    private static Boolean isConnected;
     private BatteryInfo batteryInfo;
     private DockInfo dockInfo;
     private int tickCount = 0;
@@ -35,17 +39,28 @@ public class HarmonyLinkClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         HLSETTINGS = new HLSettings("HarmonyLink.json");
+        isConnected = false;
 
         ClientLifecycleEvents.CLIENT_STARTED.register(this::initializeSettings);
         ClientTickEvents.END_CLIENT_TICK.register(this::onTick);
     }
 
     private void onTick(MinecraftClient client) {
-        if (!client.isPaused() && client.world != null) {  // We don't want to execute the code if the game is paused
-            if (++tickCount >= 20) {  // Increase the tick count and check if we've reached 20 yet (1-second timer)
-                tickCount = 0;  // Reset the tick count for next time
+        if (++tickCount >= 20) {  // Increase the tick count and check if we've reached 20 yet (1-second timer)
+            tickCount = 0; // Reset the tick count for next time
 
-                HttpClient httpclient = HttpClient.newHttpClient();
+            HttpClient httpclient = HttpClient.newHttpClient();
+
+            HttpRequest checkConnectionRequest = HttpRequest.newBuilder()
+                    .uri(URI.create("http://127.0.0.1:9000/v1/are_you_there"))
+                    .build();
+
+            httpclient.sendAsync(checkConnectionRequest, HttpResponse.BodyHandlers.ofString())
+                    .thenApply(HttpResponse::body)
+                    .thenAcceptAsync(this::handleConnectedResponse)
+                    .exceptionally(this::handleConnectedFailure);
+
+            if (getIsConnected() && !client.isPaused() && client.world != null) {  // We don't want to execute the code if the game is paused
 
                 HttpRequest batteryRequest = HttpRequest.newBuilder()
                         .uri(URI.create("http://127.0.0.1:9000/v1/battery_info"))
@@ -53,7 +68,7 @@ public class HarmonyLinkClient implements ClientModInitializer {
 
                 httpclient.sendAsync(batteryRequest, HttpResponse.BodyHandlers.ofString())
                         .thenApply(HttpResponse::body)
-                        .thenAccept(this::handleBatteryResponse);
+                        .thenAcceptAsync(this::handleBatteryResponse);
 
 
                 HttpRequest dockedRequest = HttpRequest.newBuilder()
@@ -62,7 +77,7 @@ public class HarmonyLinkClient implements ClientModInitializer {
 
                 httpclient.sendAsync(dockedRequest, HttpResponse.BodyHandlers.ofString())
                         .thenApply(HttpResponse::body)
-                        .thenAccept(this::handleDockResponse);
+                        .thenAcceptAsync(this::handleDockResponse);
             }
         }
     }
@@ -71,6 +86,27 @@ public class HarmonyLinkClient implements ClientModInitializer {
         batterySettings = new GraphicsSettings("Battery.json");
         chargingSettings = new GraphicsSettings("Charging.json");
         dockedSettings = new GraphicsSettings("Docked.json");
+    }
+
+    private void handleConnectedResponse(String Response)
+    {
+        LOGGER.info("Received String: {}", Response);
+        if (Response != null && !Response.equals(""))
+        {
+            isConnected = Objects.equals(Response, "yes");
+        }else {
+            isConnected = false;
+        }
+
+        LOGGER.info("setting isConnected: {}", isConnected);
+    }
+
+    public Void handleConnectedFailure(Throwable ex) {
+        // Handle the connection failure exception
+        //System.err.println("Failed to connect: " + ex.getMessage());
+        // Perform any additional error handling or fallback actions
+        isConnected = false;
+        return null;
     }
 
     private void handleBatteryResponse(String jsonResponse)
@@ -122,17 +158,8 @@ public class HarmonyLinkClient implements ClientModInitializer {
         }
     }
 
-    private void setRenderDistance(int distance)
+    public static Boolean getIsConnected()
     {
-        // Check if the game is running on the client side
-        if(MinecraftClient.getInstance().player != null)
-        {
-            LOGGER.info("Setting render distance to {}", distance);
-            MinecraftClient.getInstance().options.getViewDistance().setValue(distance);
-        }
-        else
-        {
-            LOGGER.warn("Attempted to set render distance from server side, this is not supported.");
-        }
+        return isConnected;
     }
 }

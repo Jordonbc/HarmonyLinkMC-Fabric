@@ -100,8 +100,8 @@ public class OptionsMenu extends Screen {
         );
         adder.add(simulationDistanceSlider);
 
-        HLSliderWidget biomeBlendRadiusSlider = new HLSliderWidget(0, 0, 150, 20, Text.of("Biomes Blend Range: " + settings.simulationDistance.getValue()),
-                new RangedValue(0, 7, settings.simulationDistance.getValue().doubleValue()),
+        HLSliderWidget biomeBlendRadiusSlider = new HLSliderWidget(0, 0, 150, 20, Text.of("Biomes Blend Range: " + settings.BiomeBlendRadius.getValue()),
+                new RangedValue(0, 7, settings.BiomeBlendRadius.getValue().doubleValue()),
                 (slider, value) -> {
                     int intValue = (int) Math.round(value);
                     LOGGER.info("Value: {}", intValue);

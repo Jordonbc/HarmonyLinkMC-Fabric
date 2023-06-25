@@ -3,7 +3,7 @@
 	"package": "com.harmonylink.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"ExampleMixin"
+		"OptionsScreenMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
