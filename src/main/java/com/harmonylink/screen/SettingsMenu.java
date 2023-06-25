@@ -1,5 +1,6 @@
 package com.harmonylink.screen;
 
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -9,6 +10,8 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import com.harmonylink.HarmonyLinkClient;
 
 import static net.fabricmc.loader.impl.FabricLoaderImpl.MOD_ID;
 
@@ -59,17 +62,32 @@ public class SettingsMenu extends Screen {
         GridWidget.Adder adder = gridWidget.createAdder(2);
 
         // Add various buttons to the grid
+
+        adder.add(ButtonWidget.builder(Text.of("Docked Settings: " + HarmonyLinkClient.HLSETTINGS.EnableDocked.getValue()), button -> {
+            Boolean isDocked = HarmonyLinkClient.HLSETTINGS.EnableDocked.getValue();
+            if (isDocked) {
+                HarmonyLinkClient.HLSETTINGS.EnableDocked.setValue(false);
+            }else {
+                HarmonyLinkClient.HLSETTINGS.EnableDocked.setValue(true);
+            }
+            //button.setMessage(Text.of("Docked Settings: " + HarmonyLinkClient.HLSETTINGS.EnableDocked.getValue()));
+            HarmonyLinkClient.HLSETTINGS.saveSettingsToFile();
+            clearAndInit();
+        }).build());
+
         adder.add(ButtonWidget.builder(Text.of("Battery"), button -> {
-            MinecraftClient.getInstance().setScreen(new OptionsMenu(this, "Battery", "Battery.json"));
+            MinecraftClient.getInstance().setScreen(new OptionsMenu(this, "Battery", HarmonyLinkClient.batterySettings));
         }).build());
 
         adder.add(ButtonWidget.builder(Text.of("Charging"), button -> {
-            MinecraftClient.getInstance().setScreen(new OptionsMenu(this, "Charging", "Charging.json"));
+            MinecraftClient.getInstance().setScreen(new OptionsMenu(this, "Charging", HarmonyLinkClient.chargingSettings));
         }).build());
 
-        adder.add(ButtonWidget.builder(Text.of("Docked"), button -> {
-            MinecraftClient.getInstance().setScreen(new OptionsMenu(this, "Docked", "Docked.json"));
-        }).build());
+        if (HarmonyLinkClient.HLSETTINGS.EnableDocked.getValue()) {
+            adder.add(ButtonWidget.builder(Text.of("Docked"), button -> {
+                MinecraftClient.getInstance().setScreen(new OptionsMenu(this, "Docked", HarmonyLinkClient.dockedSettings));
+            }).build());
+        }
 
         // Position and add the grid to the screen
         gridWidget.refreshPositions();

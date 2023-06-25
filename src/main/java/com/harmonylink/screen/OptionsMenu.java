@@ -1,7 +1,7 @@
 package com.harmonylink.screen;
 
 import com.harmonylink.RangedValue;
-import com.harmonylink.Settings;
+import com.harmonylink.GraphicsSettings;
 import com.harmonylink.screen.widgets.HLSliderWidget;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
@@ -10,11 +10,7 @@ import net.minecraft.client.gui.widget.GridWidget;
 import net.minecraft.client.gui.widget.SimplePositioningWidget;
 import net.minecraft.client.option.GraphicsMode;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralTextContent;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TextContent;
-import net.minecraft.util.Formatting;
 import net.minecraft.util.math.MathHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -26,22 +22,25 @@ public class OptionsMenu extends Screen {
     private final Screen parent;
     private final Text title;
 
-    private Settings settings;
-
-    private String fileName;
+    private GraphicsSettings settings;
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
     public OptionsMenu(Screen parent, String title, String fileName) {
         super(Text.of("Options Menu"));
         this.parent = parent;
-        this.fileName = fileName;
+        this.title = Text.of(title + " Options");
+    }
+
+    public OptionsMenu(Screen parent, String title, GraphicsSettings settings) {
+        super(Text.of("Options Menu"));
+        this.parent = parent;
+        this.settings = settings;
         this.title = Text.of(title + " Options");
     }
 
     @Override
     protected void init() {
         super.init();
-        this.settings = new Settings(fileName);
         initWidgets();
     }
 
@@ -114,11 +113,27 @@ public class OptionsMenu extends Screen {
                         slider.setMessage(Text.of("Biomes Blend Range: " + intValue));
                     }
 
-                    settings.simulationDistance.setValue(intValue);
+                    settings.BiomeBlendRadius.setValue(intValue);
                     settings.saveSettingsToFile();
                 }
         );
         adder.add(biomeBlendRadiusSlider);
+
+        HLSliderWidget guiSlider = new HLSliderWidget(0, 0, 150, 20, Text.of("GUI Scale: " + settings.guiScale.getValue()),
+                new RangedValue(0, 2, settings.guiScale.getValue().doubleValue()),
+                (slider, value) -> {
+                    int intValue = (int) Math.round(value);
+                    LOGGER.info("Value: {}", intValue);
+                    if (intValue == 0) {
+                        slider.setMessage(Text.of("GUI Scale: AUTO"));
+                    } else {
+                        slider.setMessage(Text.of("GUI Scale: " + intValue));
+                    }
+                    settings.guiScale.setValue(intValue);
+                    settings.saveSettingsToFile();
+                }
+        );
+        adder.add(guiSlider);
 
 
         // Position and add the grid to the screen

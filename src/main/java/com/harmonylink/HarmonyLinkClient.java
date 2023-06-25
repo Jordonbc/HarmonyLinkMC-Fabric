@@ -6,6 +6,7 @@ import com.google.gson.GsonBuilder;
 import com.harmonylink.API.BatteryInfo;
 import com.harmonylink.API.ChargingStatus;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import org.apache.logging.log4j.LogManager;
@@ -21,27 +22,43 @@ import static net.fabricmc.loader.impl.FabricLoaderImpl.MOD_ID;
 
 public class HarmonyLinkClient implements ClientModInitializer {
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
+
+    public static HLSettings HLSETTINGS;
+    public static GraphicsSettings batterySettings;
+    public static GraphicsSettings chargingSettings;
+    public static GraphicsSettings dockedSettings;
     private BatteryInfo batteryInfo;
     private int tickCount = 0;
 
     @Override
     public void onInitializeClient() {
-        ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (!client.isPaused() && client.world != null) {  // We don't want to execute the code if the game is paused
-                if (++tickCount >= 20) {  // Increase the tick count and check if we've reached 20 yet (1-second timer)
-                    tickCount = 0;  // Reset the tick count for next time
+        HLSETTINGS = new HLSettings("HarmonyLink.json");
 
-                    HttpClient httpclient = HttpClient.newHttpClient();
-                    HttpRequest request = HttpRequest.newBuilder()
-                            .uri(URI.create("http://127.0.0.1:9000/v1/battery_info"))
-                            .build();
+        ClientLifecycleEvents.CLIENT_STARTED.register(this::initializeSettings);
+        ClientTickEvents.END_CLIENT_TICK.register(this::onTick);
+    }
 
-                    httpclient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
-                            .thenApply(HttpResponse::body)
-                            .thenAccept(this::handleResponse);
-                }
+    private void onTick(MinecraftClient client) {
+        if (!client.isPaused() && client.world != null) {  // We don't want to execute the code if the game is paused
+            if (++tickCount >= 20) {  // Increase the tick count and check if we've reached 20 yet (1-second timer)
+                tickCount = 0;  // Reset the tick count for next time
+
+                HttpClient httpclient = HttpClient.newHttpClient();
+                HttpRequest request = HttpRequest.newBuilder()
+                        .uri(URI.create("http://127.0.0.1:9000/v1/battery_info"))
+                        .build();
+
+                httpclient.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                        .thenApply(HttpResponse::body)
+                        .thenAccept(this::handleResponse);
             }
-        });
+        }
+    }
+
+    private void initializeSettings(MinecraftClient client) {
+        batterySettings = new GraphicsSettings("Battery.json");
+        chargingSettings = new GraphicsSettings("Charging.json");
+        dockedSettings = new GraphicsSettings("Docked.json");
     }
 
     private void handleResponse(String jsonResponse)

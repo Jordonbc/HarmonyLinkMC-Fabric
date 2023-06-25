@@ -2,6 +2,7 @@ package com.harmonylink;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.GraphicsMode;
 import com.google.gson.annotations.SerializedName;
@@ -15,8 +16,8 @@ import java.io.IOException;
 
 import static net.fabricmc.loader.impl.FabricLoaderImpl.MOD_ID;
 
-public class Settings {
-    public static File file;
+public class GraphicsSettings {
+    public transient File file;
     public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
     @SerializedName("renderDistance")
@@ -27,58 +28,40 @@ public class Settings {
     public HLSimpleOption<GraphicsMode> GraphicsMode;
     @SerializedName("BiomeBlendRadius")
     public HLSimpleOption<Integer> BiomeBlendRadius;
+    @SerializedName("guiScale")
+    public HLSimpleOption<Integer> guiScale;
 
-    public Settings(String FileName) {
+    public GraphicsSettings(String FileName) {
 
-        this.file = new File(MinecraftClient.getInstance().runDirectory + "/config/HarmonyLink/" + FileName);
+        file = new File(FabricLoader.getInstance().getConfigDir() + "/HarmonyLink/" + FileName);
 
         this.renderDistance = new HLSimpleOption<Integer>(MinecraftClient.getInstance().options.getViewDistance().getValue());
         this.simulationDistance = new HLSimpleOption<Integer>(MinecraftClient.getInstance().options.getSimulationDistance().getValue());
         this.GraphicsMode = new HLSimpleOption<GraphicsMode>(MinecraftClient.getInstance().options.getGraphicsMode().getValue());
         this.BiomeBlendRadius = new HLSimpleOption<Integer>(MinecraftClient.getInstance().options.getBiomeBlendRadius().getValue());
+        this.guiScale = new HLSimpleOption<Integer>(MinecraftClient.getInstance().options.getGuiScale().getValue());
 
-        createFileIfNotExists(this.file);
-        loadOptions(this.file);
+        createFileIfNotExists(file);
+        loadOptions(file);
     }
 
     public void loadOptions(File configFile) {
         Gson gson = new Gson();
 
         try (FileReader reader = new FileReader(configFile)) {
-            Settings loadedSettings = gson.fromJson(reader, Settings.class);
+            GraphicsSettings loadedSettings = gson.fromJson(reader, GraphicsSettings.class);
 
             if (loadedSettings == null) {
                 LOGGER.error("Error loading options: Unable to deserialize settings from JSON.");
                 return;
             }
 
-            if (loadedSettings.renderDistance != null)
-            {
-                this.renderDistance = loadedSettings.renderDistance;
-            } else {
-                this.renderDistance.setValue(MinecraftClient.getInstance().options.getViewDistance().getValue());
-            }
-
-            if (loadedSettings.simulationDistance != null)
-            {
-                this.simulationDistance = loadedSettings.simulationDistance;
-            } else {
-                this.simulationDistance.setValue(MinecraftClient.getInstance().options.getSimulationDistance().getValue());
-            }
-
-            if (loadedSettings.BiomeBlendRadius != null)
-            {
-                this.BiomeBlendRadius = loadedSettings.BiomeBlendRadius;
-            } else {
-                this.BiomeBlendRadius.setValue(MinecraftClient.getInstance().options.getBiomeBlendRadius().getValue());
-            }
-
-            if (loadedSettings.GraphicsMode != null)
-            {
-                this.GraphicsMode = loadedSettings.GraphicsMode;
-            } else {
-                this.GraphicsMode.setValue(MinecraftClient.getInstance().options.getGraphicsMode().getValue());
-            }
+            // Copy values from loadedSettings to the current instance
+            this.renderDistance = loadedSettings.renderDistance;
+            this.simulationDistance = loadedSettings.simulationDistance;
+            this.GraphicsMode = loadedSettings.GraphicsMode;
+            this.BiomeBlendRadius = loadedSettings.BiomeBlendRadius;
+            this.guiScale = loadedSettings.guiScale;
 
             LOGGER.info("Options loaded successfully.");
 
@@ -88,10 +71,11 @@ public class Settings {
     }
 
 
+
     public boolean saveSettingsToFile() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-        try (FileWriter writer = new FileWriter(this.file)) {
+        try (FileWriter writer = new FileWriter(file)) {
             gson.toJson(this, writer);
             LOGGER.info("Options saved successfully.");
             return true;
