@@ -102,4 +102,14 @@ public class GraphicsSettings {
         }
     }
 
+    public void ApplySettings() {
+        if (MinecraftClient.getInstance() != null) {
+            MinecraftClient.getInstance().options.getViewDistance().setValue(renderDistance.getValue());
+            MinecraftClient.getInstance().options.getSimulationDistance().setValue(simulationDistance.getValue());
+            MinecraftClient.getInstance().options.getBiomeBlendRadius().setValue(BiomeBlendRadius.getValue());
+            MinecraftClient.getInstance().options.getGraphicsMode().setValue(GraphicsMode.getValue());
+            MinecraftClient.getInstance().options.getGuiScale().setValue(guiScale.getValue());
+        }
+    }
+
 }

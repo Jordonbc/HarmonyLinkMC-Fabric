@@ -1,9 +1,9 @@
 package com.harmonylink.API;
 
 public class DockInfo {
-    String dockModel;
-    boolean isDocked;
-    boolean fallbackDetection;
+    public String dockModel;
+    public Boolean isDocked;
+    public Boolean fallbackDetection;
 
     @Override
     public String toString() {
