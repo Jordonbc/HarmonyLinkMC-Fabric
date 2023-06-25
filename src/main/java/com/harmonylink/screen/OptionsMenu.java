@@ -72,6 +72,7 @@ public class OptionsMenu extends Screen {
             newMode = newMode.substring(0, 1).toUpperCase() + newMode.substring(1).toLowerCase();
 
             button.setMessage(Text.of("Graphics: " + newMode));
+            settings.saveSettingsToFile();
             })
         .build());
 
@@ -83,54 +84,38 @@ public class OptionsMenu extends Screen {
                     LOGGER.info("Value: {}", intValue);
                     slider.setMessage(Text.of("Render Distance: " + intValue));
                     settings.renderDistance.setValue(intValue);
-                },
-                (slider, value) -> {
-                    int intValue = (int) Math.round(value);
-                    LOGGER.info("Value: {}", intValue);
-                    slider.setMessage(Text.of("Render Distance: " + intValue));
+                    settings.saveSettingsToFile();
                 }
         );
 
 
         adder.add(renderDistanceSlider);
 
-        RangedValue simulationDistanceRanged = new RangedValue(5, 32, settings.simulationDistance.getValue().doubleValue());
-
         HLSliderWidget simulationDistanceSlider = new HLSliderWidget(0, 0, 150, 20, Text.of("Simulation Distance: " + settings.simulationDistance.getValue()),
-                simulationDistanceRanged,
+                new RangedValue(5, 32, settings.simulationDistance.getValue().doubleValue()),
                 (slider, value) -> {
-                    int intValue = (int) value;
+                    int intValue = (int) Math.round(value);
                     LOGGER.info("Value: {}", intValue);
                     slider.setMessage(Text.of("Simulation Distance: " + intValue));
-                },
-                (slider, value) -> {
-                    int intValue = (int) value;
-                    LOGGER.info("Value: {}", intValue);
                     settings.simulationDistance.setValue(intValue);
-                    simulationDistanceRanged.setValue(intValue);  // Update the RangedValue instance
+                    settings.saveSettingsToFile();
                 }
         );
         adder.add(simulationDistanceSlider);
 
-        RangedValue biomeBlendRadiusRanged = new RangedValue(0, 7, settings.BiomeBlendRadius.getValue().doubleValue());
-
-        HLSliderWidget biomeBlendRadiusSlider = new HLSliderWidget(0, 0, 150, 20, Text.of("Biome Blend Radius: " + settings.BiomeBlendRadius.getValue()),
-                biomeBlendRadiusRanged,
+        HLSliderWidget biomeBlendRadiusSlider = new HLSliderWidget(0, 0, 150, 20, Text.of("Biomes Blend Range: " + settings.simulationDistance.getValue()),
+                new RangedValue(0, 7, settings.simulationDistance.getValue().doubleValue()),
                 (slider, value) -> {
-                    int intValue = (int) value;
+                    int intValue = (int) Math.round(value);
                     LOGGER.info("Value: {}", intValue);
                     if (intValue == 0) {
-                        slider.setMessage(Text.of("Biome Blend Radius: OFF"));
+                        slider.setMessage(Text.of("Biomes Blend Range: OFF"));
+                    } else {
+                        slider.setMessage(Text.of("Biomes Blend Range: " + intValue));
                     }
-                    else {
-                        slider.setMessage(Text.of("Biome Blend Radius: " + intValue));
-                    }
-                },
-                (slider, value) -> {
-                    int intValue = (int) value;
-                    LOGGER.info("Value: {}", intValue);
-                    settings.BiomeBlendRadius.setValue(intValue);
-                    biomeBlendRadiusRanged.setValue(intValue);  // Update the RangedValue instance
+
+                    settings.simulationDistance.setValue(intValue);
+                    settings.saveSettingsToFile();
                 }
         );
         adder.add(biomeBlendRadiusSlider);
