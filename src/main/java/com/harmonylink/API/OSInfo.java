@@ -1,4 +1,4 @@
-package com.harmonylink;
+package com.harmonylink.API;
 
 public class OSInfo {
     String osType;

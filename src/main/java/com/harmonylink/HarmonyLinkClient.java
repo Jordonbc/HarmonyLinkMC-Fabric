@@ -3,12 +3,13 @@ package com.harmonylink;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.harmonylink.API.BatteryInfo;
+import com.harmonylink.API.ChargingStatus;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.MinecraftClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import net.minecraft.client.option.*;
 import net.minecraft.client.option.GraphicsMode;
 
 import java.net.URI;

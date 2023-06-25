@@ -1,4 +1,4 @@
-package com.harmonylink;
+package com.harmonylink.API;
 
 public class SystemInfo {
     OSInfo os_info;

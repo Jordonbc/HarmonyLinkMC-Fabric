@@ -1,10 +1,10 @@
-package com.harmonylink;
+package com.harmonylink.API;
 
 
 public class BatteryInfo {
-    boolean hasBattery;
-    int batteryPercent;
-    ChargingStatus chargingStatus;
+    public boolean hasBattery;
+    public int batteryPercent;
+    public ChargingStatus chargingStatus;
 
     @Override
     public String toString() {
