@@ -69,7 +69,7 @@ public class OptionsMenu extends Screen {
             newMode = newMode.substring(0, 1).toUpperCase() + newMode.substring(1).toLowerCase();
 
             button.setMessage(Text.of("Graphics: " + newMode));
-            settings.saveSettingsToFile();
+            settings.saveAndApply();
             })
         .build());
 
@@ -81,7 +81,7 @@ public class OptionsMenu extends Screen {
                     LOGGER.info("Value: {}", intValue);
                     slider.setMessage(Text.of("Render Distance: " + intValue));
                     settings.renderDistance.setValue(intValue);
-                    settings.saveSettingsToFile();
+                    settings.saveAndApply();
                 }
         );
 
@@ -95,7 +95,7 @@ public class OptionsMenu extends Screen {
                     LOGGER.info("Value: {}", intValue);
                     slider.setMessage(Text.of("Simulation Distance: " + intValue));
                     settings.simulationDistance.setValue(intValue);
-                    settings.saveSettingsToFile();
+                    settings.saveAndApply();
                 }
         );
         adder.add(simulationDistanceSlider);
@@ -112,7 +112,7 @@ public class OptionsMenu extends Screen {
                     }
 
                     settings.BiomeBlendRadius.setValue(intValue);
-                    settings.saveSettingsToFile();
+                    settings.saveAndApply();
                 }
         );
         adder.add(biomeBlendRadiusSlider);
@@ -128,7 +128,7 @@ public class OptionsMenu extends Screen {
                         slider.setMessage(Text.of("GUI Scale: " + intValue));
                     }
                     settings.guiScale.setValue(intValue);
-                    settings.saveSettingsToFile();
+                    settings.saveAndApply();
                 }
         );
         adder.add(guiSlider);

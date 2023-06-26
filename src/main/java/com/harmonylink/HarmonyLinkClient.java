@@ -122,12 +122,12 @@ public class HarmonyLinkClient implements ClientModInitializer {
             BatteryInfo newBatteryInfo = gson.fromJson(jsonResponse, BatteryInfo.class);
             if (newBatteryInfo.hasBattery)
             {
-                if (newBatteryInfo.chargingStatus == ChargingStatus.BATTERY)
+                if (newBatteryInfo.chargingStatus == ChargingStatus.Battery)
                 {
                     batterySettings.ApplySettings();
                 }
 
-                else if (newBatteryInfo.chargingStatus == ChargingStatus.CHARGING)
+                else if (newBatteryInfo.chargingStatus == ChargingStatus.Charging)
                 {
                     chargingSettings.ApplySettings();
                 }

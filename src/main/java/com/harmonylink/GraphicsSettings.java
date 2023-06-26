@@ -83,6 +83,11 @@ public class GraphicsSettings {
         }
     }
 
+    public void saveAndApply() {
+        saveSettingsToFile();
+        ApplySettings();
+    }
+
     private void createFileIfNotExists(File filePath) {
         File parentDirectory = filePath.getParentFile();
         if (!parentDirectory.exists()) {
